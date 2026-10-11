@@ -221,7 +221,7 @@ export const PurchaseInputs: React.FC<PurchaseInputsProps> = ({
       </div>
 
       {/* Valore Residuo Stimato */}
-      <div className="pt-1">
+      <div className="pt-1 space-y-1.5">
         <InputField
           label="Valore Residuo Stimato a fine periodo"
           value={valoreResiduoPercentuale}
@@ -235,6 +235,25 @@ export const PurchaseInputs: React.FC<PurchaseInputsProps> = ({
           showSlider
           subtitle={`Valore stimato: ${formatCurrency(valoreResiduoEuro)}`}
         />
+        <div className="flex gap-1.5">
+          {[25, 50, 75].map((pct) => (
+            <button
+              key={pct}
+              type="button"
+              onClick={() => onChange('valoreResiduoPercentuale', pct)}
+              className={`flex-1 py-1 px-2 text-xs font-medium rounded-lg border transition-all ${
+                valoreResiduoPercentuale === pct
+                  ? 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-900/40 dark:text-emerald-400 dark:border-emerald-700/50 shadow-sm font-semibold'
+                  : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800'
+              }`}
+            >
+              <span>{pct}%</span>
+              <span className="text-[10px] opacity-75 hidden sm:inline ml-1">
+                ({formatCurrency(prezzoAuto * (pct / 100))})
+              </span>
+            </button>
+          ))}
+        </div>
       </div>
     </div>
   );
