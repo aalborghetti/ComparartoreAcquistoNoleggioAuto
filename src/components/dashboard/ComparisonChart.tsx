@@ -13,7 +13,7 @@ import {
 } from 'recharts';
 import type { MonthlyDataPoint, BreakEvenPoint, CalculatorSummary, CarCalculatorInputs } from '../../types/calculator';
 import { formatCurrency } from '../../utils/formatters';
-import { Target, HelpCircle, ArrowDownRight, Coins } from 'lucide-react';
+import { Target, HelpCircle, Coins } from 'lucide-react';
 
 interface ComparisonChartProps {
   data: MonthlyDataPoint[];
@@ -39,7 +39,6 @@ interface DetectedIntersection {
 export const ComparisonChart: React.FC<ComparisonChartProps> = ({
   data,
   summary,
-  inputs,
   durataMesi,
 }) => {
   const [viewMode, setViewMode] = useState<ViewMode>('cashflow');
@@ -433,98 +432,8 @@ export const ComparisonChart: React.FC<ComparisonChartProps> = ({
         </ResponsiveContainer>
       </div>
 
-      {/* Box Evidenza Impatto Vendita a Fine Possesso */}
-      <div className="bg-gradient-to-r from-emerald-500/10 via-amber-500/5 to-purple-500/10 p-3.5 rounded-xl border border-emerald-200/80 dark:border-emerald-800/60 space-y-2.5">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
-          <span className="text-xs font-bold text-slate-800 dark:text-slate-100 flex items-center gap-1.5">
-            <ArrowDownRight className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-            <span>Impatto Vendita a Fine Periodo (Mese {durataMesi})</span>
-          </span>
-          <span className="text-[11px] text-slate-500 dark:text-slate-400">
-            Esborso Lordo ➔ <strong>Incasso Vendita</strong> ➔ Costo Reale Netto
-          </span>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-0.5 text-xs">
-          {/* Auto Nuova */}
-          <div className="bg-white/80 dark:bg-slate-900/80 p-2.5 rounded-lg border border-amber-200/80 dark:border-amber-900/40">
-            <div className="font-bold text-amber-600 dark:text-amber-400 text-xs mb-1">
-              Auto Nuova
-            </div>
-            <div className="text-[11px] text-slate-500 dark:text-slate-400 flex justify-between">
-              <span>Esborso lordo:</span>
-              <span className="font-mono">{formatCurrency(summary.costoTotaleEsborsoAcquisto)}</span>
-            </div>
-            <div className="text-[11px] text-emerald-600 dark:text-emerald-400 flex justify-between font-semibold">
-              <span>Incasso vendita:</span>
-              <span className="font-mono">-{formatCurrency(summary.valoreResiduoEuro)} ({inputs.valoreResiduoPercentuale}%)</span>
-            </div>
-            <div className="border-t border-slate-100 dark:border-slate-800 pt-1 mt-1 flex justify-between font-bold text-slate-800 dark:text-slate-100">
-              <span>Costo Reale:</span>
-              <span className="font-mono text-amber-600 dark:text-amber-400">{formatCurrency(summary.costoTotaleRealeAcquisto)}</span>
-            </div>
-          </div>
-
-          {/* Auto Usata */}
-          <div className={`p-2.5 rounded-lg border ${
-            summary.opzionePiuConveniente === 'usato'
-              ? 'bg-purple-500/10 dark:bg-purple-950/40 border-purple-300 dark:border-purple-700 shadow-sm ring-1 ring-purple-500/30'
-              : 'bg-white/80 dark:bg-slate-900/80 border-purple-200/80 dark:border-purple-900/40'
-          }`}>
-            <div className="font-bold text-purple-600 dark:text-purple-400 text-xs mb-1 flex items-center justify-between">
-              <span>Auto Usata</span>
-              {summary.opzionePiuConveniente === 'usato' && (
-                <span className="text-[9px] bg-purple-600 text-white px-1.5 py-0.2 rounded font-bold uppercase">Miglior TCO</span>
-              )}
-            </div>
-            <div className="text-[11px] text-slate-500 dark:text-slate-400 flex justify-between">
-              <span>Esborso lordo:</span>
-              <span className="font-mono">{formatCurrency(summary.usatoCostoTotaleEsborso)}</span>
-            </div>
-            <div className="text-[11px] text-emerald-600 dark:text-emerald-400 flex justify-between font-semibold">
-              <span>Incasso vendita:</span>
-              <span className="font-mono">-{formatCurrency(summary.usatoValoreResiduoEuro)} ({inputs.usatoValoreResiduoPercentuale}%)</span>
-            </div>
-            <div className="border-t border-slate-100 dark:border-slate-800 pt-1 mt-1 flex justify-between font-bold text-slate-800 dark:text-slate-100">
-              <span>Costo Reale:</span>
-              <span className="font-mono text-purple-600 dark:text-purple-400">{formatCurrency(summary.usatoCostoTotaleReale)}</span>
-            </div>
-          </div>
-
-          {/* NLT */}
-          <div className="bg-white/80 dark:bg-slate-900/80 p-2.5 rounded-lg border border-cyan-200/80 dark:border-cyan-900/40">
-            <div className="font-bold text-cyan-600 dark:text-cyan-400 text-xs mb-1 flex items-center justify-between">
-              <span>Noleggio (NLT)</span>
-              {summary.opzionePiuConveniente === 'nlt' && (
-                <span className="text-[9px] bg-cyan-600 text-white px-1.5 py-0.2 rounded font-bold uppercase">Miglior TCO</span>
-              )}
-            </div>
-            <div className="text-[11px] text-slate-500 dark:text-slate-400 flex justify-between">
-              <span>Canoni + anticipo:</span>
-              <span className="font-mono">{formatCurrency(summary.costoTotaleNlt)}</span>
-            </div>
-            <div className="text-[11px] text-slate-400 dark:text-slate-500 flex justify-between">
-              <span>Incasso vendita:</span>
-              <span className="font-mono">0 € (Auto restituita)</span>
-            </div>
-            <div className="border-t border-slate-100 dark:border-slate-800 pt-1 mt-1 flex justify-between font-bold text-slate-800 dark:text-slate-100">
-              <span>Costo Reale:</span>
-              <span className="font-mono text-cyan-600 dark:text-cyan-400">{formatCurrency(summary.costoTotaleNlt)}</span>
-            </div>
-          </div>
-        </div>
-
-        <div className="text-[11px] text-slate-600 dark:text-slate-300 pt-0.5 flex items-start gap-1.5 leading-relaxed">
-          <span className="text-amber-500 shrink-0 font-bold">💡</span>
-          <span>
-            <strong>Perché il noleggio sembrava più economico prima della vendita?</strong> Durante i {durataMesi} mesi, l'acquisto comporta anticipo e rate che accumulano un esborso di cassa superiore. A fine periodo, però, rivendendo la vettura recuperi capitale ({formatCurrency(summary.usatoValoreResiduoEuro)} sull'usato e {formatCurrency(summary.valoreResiduoEuro)} sul nuovo), mentre con il noleggio NLT l'auto viene restituita a costo zero di recupero.
-          </span>
-        </div>
-      </div>
-
-      <div className="flex flex-wrap items-center justify-between text-[11px] text-slate-500 dark:text-slate-400 pt-1 border-t border-slate-100 dark:border-slate-800">
-        <span>* Linea viola: Auto Usata | Linea ambra: Auto Nuova | Linea ciano: Noleggio NLT.</span>
-        <span>Asse X: progressione mensile + vendita finale | Asse Y: costo cumulativo in €</span>
+      <div className="flex items-center justify-end text-[11px] text-slate-400 dark:text-slate-500 pt-1 border-t border-slate-100 dark:border-slate-800">
+        <span>Asse X: progressione mensile | Asse Y: costo cumulativo in €</span>
       </div>
     </div>
   );
