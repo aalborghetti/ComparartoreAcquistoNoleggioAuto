@@ -71,6 +71,8 @@ export function App() {
             {/* Grafico di confronto con Break-even point */}
             <ComparisonChart
               data={monthlyData}
+              summary={summary}
+              inputs={inputs}
               breakEvenCashflow={summary.breakEvenCashflow}
               breakEvenNetTco={summary.breakEvenNetTco}
               breakEvenUsatoVsNlt={summary.breakEvenUsatoVsNlt}
