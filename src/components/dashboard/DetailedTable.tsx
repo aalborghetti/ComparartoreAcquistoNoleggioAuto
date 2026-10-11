@@ -42,7 +42,6 @@ export const DetailedTable: React.FC<DetailedTableProps> = ({ data }) => {
             <thead className="text-[11px] text-slate-400 uppercase bg-slate-50 dark:bg-slate-800/60 border-b border-slate-200 dark:border-slate-700">
               <tr>
                 <th className="py-2.5 px-3">Mese</th>
-                <th className="py-2.5 px-3 text-right">Auto Nuova (Lordo)</th>
                 <th className="py-2.5 px-3 text-right">Auto Nuova (Netto)</th>
                 <th className="py-2.5 px-3 text-right">Auto Usata (Netto)</th>
                 <th className="py-2.5 px-3 text-right">Noleggio NLT</th>
@@ -66,9 +65,6 @@ export const DetailedTable: React.FC<DetailedTableProps> = ({ data }) => {
                           Fine
                         </span>
                       )}
-                    </td>
-                    <td className="py-2.5 px-3 text-right font-mono">
-                      {formatCurrency(row.acquistoCumulato)}
                     </td>
                     <td className="py-2.5 px-3 text-right font-mono text-amber-600 dark:text-amber-400">
                       {formatCurrency(row.acquistoNetto)}
