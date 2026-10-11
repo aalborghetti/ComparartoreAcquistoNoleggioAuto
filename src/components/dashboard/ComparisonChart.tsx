@@ -27,20 +27,25 @@ interface ComparisonChartProps {
 
 type ViewMode = 'cashflow' | 'netTco';
 
+interface DetectedIntersection {
+  id: string;
+  mese: number;
+  valore: number;
+  pairName: string;
+  color: string;
+  descrizione: string;
+}
+
 export const ComparisonChart: React.FC<ComparisonChartProps> = ({
   data,
   summary,
   inputs,
-  breakEvenCashflow,
-  breakEvenNetTco,
   durataMesi,
 }) => {
   const [viewMode, setViewMode] = useState<ViewMode>('cashflow');
   const [showResaleDrop, setShowResaleDrop] = useState<boolean>(true);
 
-  const activeBreakEven = viewMode === 'netTco' ? breakEvenNetTco : breakEvenCashflow;
-
-  // Dati con punto di vendita a fine periodo
+  // Costruzione serie dati con punto di vendita finale opzionale
   const chartData = useMemo(() => {
     if (!showResaleDrop || viewMode === 'netTco' || data.length === 0) {
       return data;
@@ -49,7 +54,7 @@ export const ComparisonChart: React.FC<ComparisonChartProps> = ({
     const lastPoint = data[data.length - 1];
     if (!lastPoint) return data;
 
-    // Aggiunge il punto finale "Vendita Auto" che mostra il recupero del valore residuo
+    // Aggiunge il punto speciale "Vendita Auto" che mostra il recupero del valore residuo
     const resalePoint: MonthlyDataPoint & { isResaleDrop?: boolean } = {
       mese: durataMesi + 0.1,
       label: 'Vendita Auto',
@@ -66,6 +71,91 @@ export const ComparisonChart: React.FC<ComparisonChartProps> = ({
 
     return [...data, resalePoint];
   }, [data, showResaleDrop, viewMode, summary, durataMesi]);
+
+  // Rilevamento dinamico di tutti i punti di incrocio (Break-Even) tra le curve visibili a video
+  const detectedIntersections = useMemo<DetectedIntersection[]>(() => {
+    if (chartData.length < 2) return [];
+
+    const pairs = [
+      {
+        id: 'usato-vs-nlt',
+        pairName: 'Auto Usata vs NLT',
+        color: '#9333ea', // Viola
+        getVal1: (d: MonthlyDataPoint) => (viewMode === 'cashflow' ? d.usatoCumulato : d.usatoNetto),
+        getVal2: (d: MonthlyDataPoint) => d.nltCumulato,
+        name1: 'Auto Usata',
+        name2: 'Noleggio NLT',
+      },
+      {
+        id: 'nuovo-vs-nlt',
+        pairName: 'Auto Nuova vs NLT',
+        color: '#d97706', // Ambra
+        getVal1: (d: MonthlyDataPoint) => (viewMode === 'cashflow' ? d.acquistoCumulato : d.acquistoNetto),
+        getVal2: (d: MonthlyDataPoint) => d.nltCumulato,
+        name1: 'Auto Nuova',
+        name2: 'Noleggio NLT',
+      },
+      {
+        id: 'nuovo-vs-usato',
+        pairName: 'Auto Nuova vs Auto Usata',
+        color: '#3b82f6', // Blu
+        getVal1: (d: MonthlyDataPoint) => (viewMode === 'cashflow' ? d.acquistoCumulato : d.acquistoNetto),
+        getVal2: (d: MonthlyDataPoint) => (viewMode === 'cashflow' ? d.usatoCumulato : d.usatoNetto),
+        name1: 'Auto Nuova',
+        name2: 'Auto Usata',
+      },
+    ];
+
+    const results: DetectedIntersection[] = [];
+
+    for (const pair of pairs) {
+      for (let i = 0; i < chartData.length - 1; i++) {
+        const p1 = chartData[i];
+        const p2 = chartData[i + 1];
+
+        const v1_1 = pair.getVal1(p1);
+        const v2_1 = pair.getVal2(p1);
+
+        const v1_2 = pair.getVal1(p2);
+        const v2_2 = pair.getVal2(p2);
+
+        const diff1 = v1_1 - v2_1;
+        const diff2 = v1_2 - v2_2;
+
+        // Se hanno segni opposti (o toccano lo zero), c'è un incrocio
+        if ((diff1 < 0 && diff2 > 0) || (diff1 > 0 && diff2 < 0) || (diff1 !== 0 && diff2 === 0)) {
+          const isDrop = Boolean(p2.mese > durataMesi);
+          let exactMonth = p2.mese;
+          let exactValue = v2_2;
+
+          if (!isDrop) {
+            const delta = diff2 - diff1;
+            const fraction = delta !== 0 ? -diff1 / delta : 0.5;
+            exactMonth = Number((p1.mese + fraction * (p2.mese - p1.mese)).toFixed(1));
+            exactValue = Math.round(v1_1 + fraction * (v1_2 - v1_1));
+          } else {
+            exactMonth = durataMesi;
+            exactValue = Math.round(v2_2);
+          }
+
+          const desc = isDrop
+            ? `Incrocio con la vendita finale al mese ${durataMesi}: il realizzo dell'auto (${pair.name1}) supera la convenienza del ${pair.name2}`
+            : `Al mese ${Math.round(exactMonth)} (${formatCurrency(exactValue)}), le curve di ${pair.name1} e ${pair.name2} raggiungono la parità economica`;
+
+          results.push({
+            id: `${pair.id}-${i}`,
+            mese: exactMonth,
+            valore: exactValue,
+            pairName: pair.pairName,
+            color: pair.color,
+            descrizione: desc,
+          });
+        }
+      }
+    }
+
+    return results;
+  }, [chartData, viewMode, durataMesi]);
 
   // Custom Tooltip Formatter
   const CustomTooltip = ({ active, payload }: any) => {
@@ -219,27 +309,36 @@ export const ComparisonChart: React.FC<ComparisonChartProps> = ({
         </div>
       </div>
 
-      {/* Break-even Point Banner */}
-      {activeBreakEven && activeBreakEven.esiste ? (
-        <div className="bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-900/50 p-2.5 rounded-xl flex items-center justify-between text-xs text-blue-900 dark:text-blue-200">
-          <div className="flex items-center gap-2">
-            <span className="p-1 rounded-lg bg-blue-500 text-white shrink-0">
-              <Target className="w-3.5 h-3.5" />
-            </span>
-            <span>
-              <strong>Punto di Pareggio (Break-Even Nuovo/NLT):</strong> Al mese <strong>{Math.round(activeBreakEven.mese)}</strong>{' '}
-              ({formatCurrency(activeBreakEven.valore)}), le curve hanno lo stesso costo cumulativo.
-            </span>
-          </div>
-          <span className="hidden md:inline-block font-mono text-[11px] px-2 py-0.5 rounded bg-blue-200/60 dark:bg-blue-900/60">
-            Mese {activeBreakEven.mese}
-          </span>
+      {/* Break-even Points Banner (Tutti i pareggi rilevati tra le curve) */}
+      {detectedIntersections.length > 0 ? (
+        <div className="space-y-1.5">
+          {detectedIntersections.map((inter) => (
+            <div
+              key={inter.id}
+              className="bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800 p-2.5 rounded-xl flex items-center justify-between text-xs text-slate-800 dark:text-slate-200 shadow-xs"
+            >
+              <div className="flex items-center gap-2">
+                <span
+                  className="p-1 rounded-lg text-white shrink-0 shadow-xs"
+                  style={{ backgroundColor: inter.color }}
+                >
+                  <Target className="w-3.5 h-3.5" />
+                </span>
+                <span>
+                  <strong>Punto di Pareggio ({inter.pairName}):</strong> {inter.descrizione}.
+                </span>
+              </div>
+              <span className="hidden sm:inline-block font-mono text-[11px] px-2 py-0.5 rounded bg-white dark:bg-slate-900 font-bold shadow-xs border border-slate-200/80 dark:border-slate-700/80">
+                Mese {Math.round(inter.mese)}
+              </span>
+            </div>
+          ))}
         </div>
       ) : (
         <div className="bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800 p-2.5 rounded-xl flex items-center gap-2 text-xs text-slate-600 dark:text-slate-400">
           <HelpCircle className="w-3.5 h-3.5 text-slate-400 shrink-0" />
           <span>
-            Nessun punto di incrocio diretto nei {durataMesi} mesi tra Nuovo e NLT: le curve mantengono un andamento parallelo o distanziato.
+            Nessun punto di incrocio nei {durataMesi} mesi tra le opzioni: le curve mantengono costi distanziati senza sovrapporsi.
           </span>
         </div>
       )}
@@ -310,25 +409,26 @@ export const ComparisonChart: React.FC<ComparisonChartProps> = ({
               activeDot={{ r: 5, fill: '#9333ea', stroke: '#fff', strokeWidth: 2 }}
             />
 
-            {/* Break-even point marker per Nuovo/NLT se presente */}
-            {activeBreakEven && activeBreakEven.esiste && (
-              <>
+            {/* Indicatori grafici per tutti i punti di incrocio rilevati */}
+            {detectedIntersections.map((inter) => (
+              <React.Fragment key={inter.id}>
                 <ReferenceLine
-                  x={Math.round(activeBreakEven.mese)}
-                  stroke="#ef4444"
+                  x={Math.round(inter.mese)}
+                  stroke={inter.color}
                   strokeDasharray="4 4"
                   strokeWidth={1.5}
+                  opacity={0.8}
                 />
                 <ReferenceDot
-                  x={Math.round(activeBreakEven.mese)}
-                  y={activeBreakEven.valore}
+                  x={Math.round(inter.mese)}
+                  y={inter.valore}
                   r={5}
-                  fill="#ef4444"
+                  fill={inter.color}
                   stroke="#fff"
                   strokeWidth={2}
                 />
-              </>
-            )}
+              </React.Fragment>
+            ))}
           </LineChart>
         </ResponsiveContainer>
       </div>
@@ -423,7 +523,7 @@ export const ComparisonChart: React.FC<ComparisonChartProps> = ({
       </div>
 
       <div className="flex flex-wrap items-center justify-between text-[11px] text-slate-500 dark:text-slate-400 pt-1 border-t border-slate-100 dark:border-slate-800">
-        <span>* Linea viola: Auto Usata (prezzo d'acquisto minore, manutenzione superiore).</span>
+        <span>* Linea viola: Auto Usata | Linea ambra: Auto Nuova | Linea ciano: Noleggio NLT.</span>
         <span>Asse X: progressione mensile + vendita finale | Asse Y: costo cumulativo in €</span>
       </div>
     </div>
