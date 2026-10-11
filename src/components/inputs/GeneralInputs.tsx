@@ -16,7 +16,7 @@ export const GeneralInputs: React.FC<GeneralInputsProps> = ({
   onChangeDurata,
   onChangeKm,
 }) => {
-  const quickDurations = [24, 36, 48, 60];
+  const quickDurations = [12, 48, 60, 120];
   const quickKms = [10000, 15000, 20000, 30000];
 
   return (
@@ -28,7 +28,7 @@ export const GeneralInputs: React.FC<GeneralInputsProps> = ({
           value={durataMesi}
           onChange={onChangeDurata}
           min={12}
-          max={84}
+          max={120}
           step={6}
           unit="mesi"
           icon={<Calendar className="w-4 h-4 text-blue-500" />}
