@@ -36,14 +36,9 @@ export const KpiCards: React.FC<KpiCardsProps> = ({ summary, inputs }) => {
               <div className="p-1.5 rounded-xl bg-amber-100 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400">
                 <ShoppingCart className="w-4 h-4" />
               </div>
-              <div>
-                <span className="text-[10px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider block">
-                  Proprietà {inputs.metodoPagamentoNuovo === 'tutto_subito' ? '• Tutto subito' : '• Finanziata'}
-                </span>
-                <h3 className="text-xs font-bold text-slate-800 dark:text-slate-200">
-                  Auto Nuova
-                </h3>
-              </div>
+              <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200">
+                Auto Nuova
+              </h3>
             </div>
 
             <div className="mt-2">
@@ -92,14 +87,9 @@ export const KpiCards: React.FC<KpiCardsProps> = ({ summary, inputs }) => {
               <div className="p-1.5 rounded-xl bg-purple-100 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400">
                 <CarFront className="w-4 h-4" />
               </div>
-              <div>
-                <span className="text-[10px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider block">
-                  Usato {inputs.metodoPagamentoUsato === 'tutto_subito' ? '• Tutto subito' : '• Finanziato'}
-                </span>
-                <h3 className="text-xs font-bold text-slate-800 dark:text-slate-200">
-                  Auto Usata
-                </h3>
-              </div>
+              <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200">
+                Auto Usata
+              </h3>
             </div>
 
             <div className="mt-2">
@@ -148,14 +138,9 @@ export const KpiCards: React.FC<KpiCardsProps> = ({ summary, inputs }) => {
               <div className="p-1.5 rounded-xl bg-cyan-100 dark:bg-cyan-950/60 text-cyan-600 dark:text-cyan-400">
                 <KeyRound className="w-4 h-4" />
               </div>
-              <div>
-                <span className="text-[10px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider block">
-                  All-Inclusive
-                </span>
-                <h3 className="text-xs font-bold text-slate-800 dark:text-slate-200">
-                  Noleggio NLT
-                </h3>
-              </div>
+              <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200">
+                Noleggio NLT
+              </h3>
             </div>
 
             <div className="mt-2">
