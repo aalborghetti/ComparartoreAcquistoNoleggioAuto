@@ -205,7 +205,6 @@ export const ComparisonChart: React.FC<ComparisonChartProps> = ({
               name={viewMode === 'cashflow' ? 'Auto Usata (Esborso)' : 'Auto Usata (Net TCO)'}
               stroke="#9333ea"
               strokeWidth={2.5}
-              strokeDasharray="4 4"
               dot={false}
               activeDot={{ r: 5, fill: '#9333ea', stroke: '#fff', strokeWidth: 2 }}
             />
@@ -234,7 +233,7 @@ export const ComparisonChart: React.FC<ComparisonChartProps> = ({
       </div>
 
       <div className="flex flex-wrap items-center justify-between text-[11px] text-slate-500 dark:text-slate-400 pt-1 border-t border-slate-100 dark:border-slate-800">
-        <span>* Curva tratteggiata viola: Auto Usata (prezzo d'acquisto minore, manutenzione superiore).</span>
+        <span>* Linea viola: Auto Usata (prezzo d'acquisto minore, manutenzione superiore).</span>
         <span>Asse X: progressione mensile | Asse Y: costo cumulativo in €</span>
       </div>
     </div>
