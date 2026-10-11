@@ -5,7 +5,7 @@ export const PRESET_SCENARIOS: PresetScenario[] = [
     id: 'crossover-family',
     name: 'SUV Compatto / Crossover (es. Puma / Captur)',
     category: 'Medio',
-    description: 'Auto da 28.000 € nuova vs 14.500 € usata con manutenzione maggiorata, 36 mesi.',
+    description: 'Auto da 28.000 € nuova vs 16.000 € usata con manutenzione maggiorata, 36 mesi.',
     inputs: {
       durataMesi: 36,
       kmAnnui: 15000,
@@ -22,13 +22,13 @@ export const PRESET_SCENARIOS: PresetScenario[] = [
 
       // Auto Usata (acquisto più basso, manutenzione più alta per usura)
       metodoPagamentoUsato: 'finanziamento',
-      usatoPrezzoAuto: 14500,
+      usatoPrezzoAuto: 16000,
       usatoAnticipoAcquisto: 2500,
       usatoTassoTaeg: 7.5,
       usatoAssicurazioneAnnua: 850,
       usatoBolloAnnuo: 240,
       usatoManutenzioneAnnua: 1050,
-      usatoValoreResiduoPercentuale: 35,
+      usatoValoreResiduoPercentuale: 40,
 
       // Noleggio NLT
       anticipoNlt: 3500,
@@ -41,14 +41,14 @@ export const PRESET_SCENARIOS: PresetScenario[] = [
     id: 'citycar-economy',
     name: 'Citycar Compatta (es. Panda / 500 / Clio)',
     category: 'Economico',
-    description: 'Auto utilitaria da 17.500 € nuova vs 8.500 € usata di 4 anni, 48 mesi.',
+    description: 'Auto utilitaria da 16.000 € nuova (base) vs 8.500 € usata di 4 anni, 48 mesi.',
     inputs: {
       durataMesi: 48,
       kmAnnui: 12000,
 
       // Auto Nuova
       metodoPagamentoNuovo: 'finanziamento',
-      prezzoAuto: 17500,
+      prezzoAuto: 16000,
       anticipoAcquisto: 2500,
       tassoTaeg: 5.9,
       assicurazioneAnnua: 750,

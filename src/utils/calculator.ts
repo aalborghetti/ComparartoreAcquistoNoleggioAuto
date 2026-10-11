@@ -127,7 +127,7 @@ export function calculateCarTco(inputs: CarCalculatorInputs): {
   const svalutazioneMensile = (prezzoAuto - valoreResiduoEuro) / validDurata;
 
   // --- 3. Calcoli Auto Usata ---
-  const validUsatoPrezzo = Math.max(0, usatoPrezzoAuto || 14500);
+  const validUsatoPrezzo = Math.max(0, usatoPrezzoAuto || 16000);
   const validUsatoAnticipo = isFinanziamentoUsato ? Math.max(0, usatoAnticipoAcquisto || 2500) : validUsatoPrezzo;
   const usatoImportoDaFinanziare = isFinanziamentoUsato ? Math.max(0, validUsatoPrezzo - validUsatoAnticipo) : 0;
   const usatoRataFinanziamento = isFinanziamentoUsato ? calculateMonthlyPayment(usatoImportoDaFinanziare, usatoTassoTaeg || 7.5, validDurata) : 0;
@@ -135,7 +135,7 @@ export function calculateCarTco(inputs: CarCalculatorInputs): {
   const usatoCostiGestioneAnnui = (usatoAssicurazioneAnnua || 850) + (usatoBolloAnnuo || 240) + (usatoManutenzioneAnnua || 1050);
   const usatoQuotaGestioneMensile = usatoCostiGestioneAnnui / 12;
   const usatoCostiGestioneTotali = usatoQuotaGestioneMensile * validDurata;
-  const usatoValoreResiduoEuro = validUsatoPrezzo * (Math.max(0, usatoValoreResiduoPercentuale || 35) / 100);
+  const usatoValoreResiduoEuro = validUsatoPrezzo * (Math.max(0, usatoValoreResiduoPercentuale || 40) / 100);
   const usatoSvalutazioneMensile = (validUsatoPrezzo - usatoValoreResiduoEuro) / validDurata;
 
   // --- Generazione array mensile ---
