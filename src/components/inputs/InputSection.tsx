@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { Sliders, ShoppingCart, CarFront, KeyRound, RotateCcw, Sparkles } from 'lucide-react';
-import type { CarCalculatorInputs, CalculatorSummary } from '../../types/calculator';
+import type { CarCalculatorInputs, CalculatorSummary, PresetScenario } from '../../types/calculator';
 import { GeneralInputs } from './GeneralInputs';
 import { PurchaseInputs } from './PurchaseInputs';
 import { UsedCarInputs } from './UsedCarInputs';
 import { RentalInputs } from './RentalInputs';
 import { PRESET_SCENARIOS } from '../../utils/presets';
+import { ConfirmModal } from '../common/ConfirmModal';
 
 interface InputSectionProps {
   inputs: CarCalculatorInputs;
@@ -25,6 +26,8 @@ export const InputSection: React.FC<InputSectionProps> = ({
   onReset,
 }) => {
   const [activeTab, setActiveTab] = useState<TabType>('acquisto');
+  const [pendingScenario, setPendingScenario] = useState<PresetScenario | null>(null);
+  const [isResetConfirmOpen, setIsResetConfirmOpen] = useState(false);
 
   return (
     <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden flex flex-col h-full">
@@ -42,7 +45,7 @@ export const InputSection: React.FC<InputSectionProps> = ({
           
           <button
             type="button"
-            onClick={onReset}
+            onClick={() => setIsResetConfirmOpen(true)}
             title="Ripristina valori predefiniti"
             className="flex items-center gap-1 text-xs text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 px-2 py-1 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
           >
@@ -61,7 +64,7 @@ export const InputSection: React.FC<InputSectionProps> = ({
             <button
               key={preset.id}
               type="button"
-              onClick={() => onLoadPreset(preset.id)}
+              onClick={() => setPendingScenario(preset)}
               className="text-[11px] whitespace-nowrap px-2.5 py-1 rounded-full font-medium bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition-all border border-transparent hover:border-slate-300 dark:hover:border-slate-600"
             >
               {preset.name.split(' ')[0]} {preset.name.split(' ')[1]}
@@ -206,6 +209,37 @@ export const InputSection: React.FC<InputSectionProps> = ({
           )}
         </div>
       </div>
+
+      {/* Modal di Conferma Cambio Scenario */}
+      <ConfirmModal
+        isOpen={pendingScenario !== null}
+        title="Attenzione: i dati modificati andranno persi"
+        message="Selezionando questo scenario, tutti i valori attualmente inseriti o modificati nei form verranno sovrascritti con i parametri predefiniti."
+        scenarioName={pendingScenario ? pendingScenario.name : undefined}
+        confirmText="Continua e carica scenario"
+        cancelText="Annulla"
+        onConfirm={() => {
+          if (pendingScenario) {
+            onLoadPreset(pendingScenario.id);
+            setPendingScenario(null);
+          }
+        }}
+        onCancel={() => setPendingScenario(null)}
+      />
+
+      {/* Modal di Conferma Reset */}
+      <ConfirmModal
+        isOpen={isResetConfirmOpen}
+        title="Ripristinare i parametri iniziali?"
+        message="Tutte le modifiche apportate ai parametri verranno perse e ripristinate alla configurazione iniziale predefinita."
+        confirmText="Ripristina valori"
+        cancelText="Annulla"
+        onConfirm={() => {
+          onReset();
+          setIsResetConfirmOpen(false);
+        }}
+        onCancel={() => setIsResetConfirmOpen(false)}
+      />
     </div>
   );
 };
