@@ -14,6 +14,7 @@ interface InputFieldProps {
   showSlider?: boolean;
   sliderStep?: number;
   subtitle?: string;
+  disabled?: boolean;
 }
 
 export const InputField: React.FC<InputFieldProps> = ({
@@ -29,8 +30,10 @@ export const InputField: React.FC<InputFieldProps> = ({
   showSlider = false,
   sliderStep,
   subtitle,
+  disabled = false,
 }) => {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (disabled) return;
     const rawVal = e.target.value;
     if (rawVal === '') {
       onChange(0);
@@ -43,15 +46,33 @@ export const InputField: React.FC<InputFieldProps> = ({
   };
 
   return (
-    <div className="space-y-1.5 bg-white dark:bg-slate-900/60 p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 transition-all hover:border-slate-300 dark:hover:border-slate-700">
+    <div
+      className={`space-y-1.5 p-3.5 rounded-xl border transition-all ${
+        disabled
+          ? 'bg-slate-100/70 dark:bg-slate-900/40 border-slate-200/60 dark:border-slate-800/50 opacity-60 cursor-not-allowed'
+          : 'bg-white dark:bg-slate-900/60 border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700'
+      }`}
+    >
       <div className="flex items-center justify-between">
-        <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
-          {icon && <span className="text-slate-400 dark:text-slate-500">{icon}</span>}
+        <label
+          className={`text-xs font-semibold flex items-center gap-1.5 ${
+            disabled ? 'text-slate-400 dark:text-slate-500' : 'text-slate-700 dark:text-slate-300'
+          }`}
+        >
+          {icon && (
+            <span className={disabled ? 'text-slate-300 dark:text-slate-600' : 'text-slate-400 dark:text-slate-500'}>
+              {icon}
+            </span>
+          )}
           <span>{label}</span>
           {tooltip && <Tooltip content={tooltip} />}
         </label>
         {subtitle && (
-          <span className="text-[11px] font-medium text-slate-500 dark:text-slate-400">
+          <span
+            className={`text-[11px] font-medium ${
+              disabled ? 'text-slate-400 dark:text-slate-600' : 'text-slate-500 dark:text-slate-400'
+            }`}
+          >
             {subtitle}
           </span>
         )}
@@ -65,11 +86,20 @@ export const InputField: React.FC<InputFieldProps> = ({
           step={step}
           value={value === 0 ? '' : value}
           placeholder="0"
+          disabled={disabled}
           onChange={handleInputChange}
-          className="w-full pl-3 pr-12 py-2 text-sm font-medium bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+          className={`w-full pl-3 pr-12 py-2 text-sm font-medium border rounded-lg transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none ${
+            disabled
+              ? 'bg-slate-100 dark:bg-slate-900/60 border-slate-200/60 dark:border-slate-800 text-slate-400 dark:text-slate-500 cursor-not-allowed'
+              : 'bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent'
+          }`}
         />
         {unit && (
-          <div className="absolute right-3 text-xs font-bold text-slate-400 dark:text-slate-500 pointer-events-none">
+          <div
+            className={`absolute right-3 text-xs font-bold pointer-events-none ${
+              disabled ? 'text-slate-300 dark:text-slate-600' : 'text-slate-400 dark:text-slate-500'
+            }`}
+          >
             {unit}
           </div>
         )}
@@ -83,8 +113,13 @@ export const InputField: React.FC<InputFieldProps> = ({
             max={max}
             step={sliderStep || step}
             value={value}
-            onChange={(e) => onChange(parseFloat(e.target.value))}
-            className="w-full h-1.5 bg-slate-200 dark:bg-slate-800 rounded-lg appearance-none cursor-pointer"
+            disabled={disabled}
+            onChange={(e) => !disabled && onChange(parseFloat(e.target.value))}
+            className={`w-full h-1.5 rounded-lg appearance-none ${
+              disabled
+                ? 'bg-slate-200/60 dark:bg-slate-800/50 cursor-not-allowed opacity-40'
+                : 'bg-slate-200 dark:bg-slate-800 cursor-pointer'
+            }`}
           />
           <div className="flex justify-between text-[10px] text-slate-400 dark:text-slate-500 mt-0.5">
             <span>{min} {unit}</span>

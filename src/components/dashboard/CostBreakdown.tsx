@@ -65,7 +65,9 @@ export const CostBreakdown: React.FC<CostBreakdownProps> = ({ summary, inputs })
             <div className="flex justify-between items-center">
               <span className="flex items-center gap-1.5">
                 <span className="w-2 h-2 rounded-full bg-red-400 inline-block" />
-                Interessi finanziamento (TAEG {inputs.tassoTaeg}%):
+                {inputs.metodoPagamentoNuovo === 'tutto_subito'
+                  ? 'Interessi finanziamento (Tutto subito):'
+                  : `Interessi finanziamento (TAEG ${inputs.tassoTaeg}%):`}
               </span>
               <span className="font-semibold">{formatCurrency(summary.totaleInteressiFinanziamento)}</span>
             </div>

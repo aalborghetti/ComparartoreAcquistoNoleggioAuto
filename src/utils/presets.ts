@@ -11,6 +11,7 @@ export const PRESET_SCENARIOS: PresetScenario[] = [
       kmAnnui: 15000,
 
       // Auto Nuova
+      metodoPagamentoNuovo: 'finanziamento',
       prezzoAuto: 28000,
       anticipoAcquisto: 5000,
       tassoTaeg: 6.5,
@@ -20,6 +21,7 @@ export const PRESET_SCENARIOS: PresetScenario[] = [
       valoreResiduoPercentuale: 45,
 
       // Auto Usata (acquisto più basso, manutenzione più alta per usura)
+      metodoPagamentoUsato: 'finanziamento',
       usatoPrezzoAuto: 14500,
       usatoAnticipoAcquisto: 2500,
       usatoTassoTaeg: 7.5,
@@ -45,6 +47,7 @@ export const PRESET_SCENARIOS: PresetScenario[] = [
       kmAnnui: 12000,
 
       // Auto Nuova
+      metodoPagamentoNuovo: 'finanziamento',
       prezzoAuto: 17500,
       anticipoAcquisto: 2500,
       tassoTaeg: 5.9,
@@ -54,6 +57,7 @@ export const PRESET_SCENARIOS: PresetScenario[] = [
       valoreResiduoPercentuale: 38,
 
       // Auto Usata
+      metodoPagamentoUsato: 'finanziamento',
       usatoPrezzoAuto: 8500,
       usatoAnticipoAcquisto: 1500,
       usatoTassoTaeg: 7.0,
@@ -79,6 +83,7 @@ export const PRESET_SCENARIOS: PresetScenario[] = [
       kmAnnui: 20000,
 
       // Auto Nuova
+      metodoPagamentoNuovo: 'finanziamento',
       prezzoAuto: 46000,
       anticipoAcquisto: 8000,
       tassoTaeg: 5.5,
@@ -88,6 +93,7 @@ export const PRESET_SCENARIOS: PresetScenario[] = [
       valoreResiduoPercentuale: 50,
 
       // Auto Usata
+      metodoPagamentoUsato: 'finanziamento',
       usatoPrezzoAuto: 24000,
       usatoAnticipoAcquisto: 5000,
       usatoTassoTaeg: 6.9,

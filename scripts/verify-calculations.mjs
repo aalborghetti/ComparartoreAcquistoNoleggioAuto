@@ -93,6 +93,45 @@ console.log('Break-even cassa rilevato:', resultEccedenza.summary.breakEvenCashf
 console.log('Break-even TCO netto rilevato:', resultEccedenza.summary.breakEvenNetTco?.descrizione || 'Nessuno');
 console.log('✓ Test 5 superato!');
 
+// Test 6: Verifica Modalità "Tutto Subito" (senza finanziamento)
+console.log('\n--- TEST 6: Verifica Modalità "Tutto Subito" ---');
+const inputsTuttoSubito = {
+  ...inputs,
+  metodoPagamentoNuovo: 'tutto_subito',
+  metodoPagamentoUsato: 'tutto_subito',
+};
+const resTuttoSubito = calculateCarTco(inputsTuttoSubito);
+
+console.log(`Auto Nuova Tutto Subito - Importo finanziato: ${resTuttoSubito.summary.importoFinanziato} € (atteso: 0 €)`);
+console.log(`Auto Nuova Tutto Subito - Rata mensile: ${resTuttoSubito.summary.rataFinanziamentoMensile} € (atteso: 0 €)`);
+console.log(`Auto Nuova Tutto Subito - Interessi: ${resTuttoSubito.summary.totaleInteressiFinanziamento} € (atteso: 0 €)`);
+console.log(`Auto Nuova Tutto Subito - Esborso Mese 0: ${resTuttoSubito.monthlyData[0].acquistoCumulato} € (atteso: 30000 €)`);
+
+if (resTuttoSubito.summary.importoFinanziato !== 0 || resTuttoSubito.summary.totaleInteressiFinanziamento !== 0) {
+  throw new Error('Test 6 fallito: importo finanziato o interessi diversi da 0 in Tutto Subito');
+}
+if (resTuttoSubito.monthlyData[0].acquistoCumulato !== 30000) {
+  throw new Error('Test 6 fallito: esborso Mese 0 diverso dal prezzo intero');
+}
+
+// Esborso totale atteso = 30000 (prezzo) + (1200 + 300 + 600) * 3 = 30000 + 6300 = 36300
+const attesoEsborsoNuovo = 30000 + ((1200 + 300 + 600) * 3);
+if (resTuttoSubito.summary.costoTotaleEsborsoAcquisto !== attesoEsborsoNuovo) {
+  throw new Error(`Test 6 fallito su esborso totale: atteso ${attesoEsborsoNuovo}, ottenuto ${resTuttoSubito.summary.costoTotaleEsborsoAcquisto}`);
+}
+
+// Costo reale atteso = 36300 - 12000 (residuo) = 24300 €
+const attesoRealeNuovo = attesoEsborsoNuovo - 12000;
+if (resTuttoSubito.summary.costoTotaleRealeAcquisto !== attesoRealeNuovo) {
+  throw new Error(`Test 6 fallito su costo reale: atteso ${attesoRealeNuovo}, ottenuto ${resTuttoSubito.summary.costoTotaleRealeAcquisto}`);
+}
+
+// Verifica Usato Tutto Subito
+if (resTuttoSubito.summary.usatoImportoFinanziato !== 0 || resTuttoSubito.summary.usatoTotaleInteressiFinanziamento !== 0) {
+  throw new Error('Test 6 fallito su Usato: finanziamento o interessi diversi da 0');
+}
+console.log('✓ Test 6 superato!');
+
 console.log('\n======================================================');
-console.log('TUTTI I TEST (INCLUSI I KM ECCEDENTI) HANNO AVUTO SUCCESSO!');
+console.log('TUTTI I TEST (INCLUSO IL PAGAMENTO TUTTO SUBITO) HANNO AVUTO SUCCESSO!');
 console.log('======================================================');

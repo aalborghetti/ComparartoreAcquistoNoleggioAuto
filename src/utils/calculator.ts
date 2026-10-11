@@ -74,6 +74,7 @@ export function calculateCarTco(inputs: CarCalculatorInputs): {
     kmAnnui,
 
     // Auto Nuova
+    metodoPagamentoNuovo,
     prezzoAuto,
     anticipoAcquisto,
     tassoTaeg,
@@ -83,6 +84,7 @@ export function calculateCarTco(inputs: CarCalculatorInputs): {
     valoreResiduoPercentuale,
 
     // Auto Usata
+    metodoPagamentoUsato,
     usatoPrezzoAuto,
     usatoAnticipoAcquisto,
     usatoTassoTaeg,
@@ -98,6 +100,9 @@ export function calculateCarTco(inputs: CarCalculatorInputs): {
     costoKmEccedenteNlt,
   } = inputs;
 
+  const isFinanziamentoNuovo = metodoPagamentoNuovo !== 'tutto_subito';
+  const isFinanziamentoUsato = metodoPagamentoUsato !== 'tutto_subito';
+
   const validDurata = Math.max(1, Math.round(durataMesi));
   const validKmAnnui = Math.max(0, kmAnnui);
   const kmTotali = (validKmAnnui / 12) * validDurata;
@@ -111,9 +116,10 @@ export function calculateCarTco(inputs: CarCalculatorInputs): {
   const quotaMeseKmEccedenti = costoTotaleKmEccedentiNlt / validDurata;
 
   // --- 2. Calcoli Auto Nuova ---
-  const importoDaFinanziare = Math.max(0, prezzoAuto - anticipoAcquisto);
-  const rataFinanziamento = calculateMonthlyPayment(importoDaFinanziare, tassoTaeg, validDurata);
-  const totaleInteressi = Math.max(0, (rataFinanziamento * validDurata) - importoDaFinanziare);
+  const anticipoNuovoEffettivo = isFinanziamentoNuovo ? anticipoAcquisto : prezzoAuto;
+  const importoDaFinanziare = isFinanziamentoNuovo ? Math.max(0, prezzoAuto - anticipoAcquisto) : 0;
+  const rataFinanziamento = isFinanziamentoNuovo ? calculateMonthlyPayment(importoDaFinanziare, tassoTaeg, validDurata) : 0;
+  const totaleInteressi = isFinanziamentoNuovo ? Math.max(0, (rataFinanziamento * validDurata) - importoDaFinanziare) : 0;
   const costiGestioneAnnui = assicurazioneAnnua + bolloAnnuo + manutenzioneAnnua;
   const quotaGestioneMensile = costiGestioneAnnui / 12;
   const costiGestioneTotali = quotaGestioneMensile * validDurata;
@@ -122,10 +128,10 @@ export function calculateCarTco(inputs: CarCalculatorInputs): {
 
   // --- 3. Calcoli Auto Usata ---
   const validUsatoPrezzo = Math.max(0, usatoPrezzoAuto || 14500);
-  const validUsatoAnticipo = Math.max(0, usatoAnticipoAcquisto || 2500);
-  const usatoImportoDaFinanziare = Math.max(0, validUsatoPrezzo - validUsatoAnticipo);
-  const usatoRataFinanziamento = calculateMonthlyPayment(usatoImportoDaFinanziare, usatoTassoTaeg || 7.5, validDurata);
-  const usatoTotaleInteressi = Math.max(0, (usatoRataFinanziamento * validDurata) - usatoImportoDaFinanziare);
+  const validUsatoAnticipo = isFinanziamentoUsato ? Math.max(0, usatoAnticipoAcquisto || 2500) : validUsatoPrezzo;
+  const usatoImportoDaFinanziare = isFinanziamentoUsato ? Math.max(0, validUsatoPrezzo - validUsatoAnticipo) : 0;
+  const usatoRataFinanziamento = isFinanziamentoUsato ? calculateMonthlyPayment(usatoImportoDaFinanziare, usatoTassoTaeg || 7.5, validDurata) : 0;
+  const usatoTotaleInteressi = isFinanziamentoUsato ? Math.max(0, (usatoRataFinanziamento * validDurata) - usatoImportoDaFinanziare) : 0;
   const usatoCostiGestioneAnnui = (usatoAssicurazioneAnnua || 850) + (usatoBolloAnnuo || 240) + (usatoManutenzioneAnnua || 1050);
   const usatoQuotaGestioneMensile = usatoCostiGestioneAnnui / 12;
   const usatoCostiGestioneTotali = usatoQuotaGestioneMensile * validDurata;
@@ -135,18 +141,18 @@ export function calculateCarTco(inputs: CarCalculatorInputs): {
   // --- Generazione array mensile ---
   const monthlyData: MonthlyDataPoint[] = [];
 
-  // Mese 0 (Anticipi iniziali)
+  // Mese 0 (Anticipi iniziali / Esborso immediato)
   monthlyData.push({
     mese: 0,
     label: 'Mese 0',
     nltCumulato: Math.round(anticipoNlt),
-    acquistoCumulato: Math.round(anticipoAcquisto),
+    acquistoCumulato: Math.round(anticipoNuovoEffettivo),
     valoreAutoStimato: Math.round(prezzoAuto),
-    acquistoNetto: Math.round(anticipoAcquisto - prezzoAuto),
+    acquistoNetto: Math.round(anticipoNuovoEffettivo - prezzoAuto),
     usatoCumulato: Math.round(validUsatoAnticipo),
     usatoValoreAutoStimato: Math.round(validUsatoPrezzo),
     usatoNetto: Math.round(validUsatoAnticipo - validUsatoPrezzo),
-    differenzaCumulata: Math.round(anticipoAcquisto - anticipoNlt),
+    differenzaCumulata: Math.round(anticipoNuovoEffettivo - anticipoNlt),
   });
 
   for (let m = 1; m <= validDurata; m++) {
@@ -154,7 +160,7 @@ export function calculateCarTco(inputs: CarCalculatorInputs): {
     const nltCum = anticipoNlt + (canoneMensileNlt * m) + (quotaMeseKmEccedenti * m);
 
     // Auto Nuova
-    const acquistoCum = anticipoAcquisto + (rataFinanziamento * m) + (quotaGestioneMensile * m);
+    const acquistoCum = anticipoNuovoEffettivo + (rataFinanziamento * m) + (quotaGestioneMensile * m);
     const valoreAutoMese = Math.max(0, prezzoAuto - (svalutazioneMensile * m));
     const acquistoNetto = acquistoCum - valoreAutoMese;
 
@@ -184,7 +190,7 @@ export function calculateCarTco(inputs: CarCalculatorInputs): {
   const costoAlKmNlt = kmTotali > 0 ? costoTotaleNlt / kmTotali : 0;
 
   // Auto Nuova
-  const costoTotaleEsborsoAcquisto = anticipoAcquisto + (rataFinanziamento * validDurata) + costiGestioneTotali;
+  const costoTotaleEsborsoAcquisto = anticipoNuovoEffettivo + (rataFinanziamento * validDurata) + costiGestioneTotali;
   const costoTotaleRealeAcquisto = costoTotaleEsborsoAcquisto - valoreResiduoEuro;
   const costoMensileMedioAcquisto = costoTotaleRealeAcquisto / validDurata;
   const costoAlKmAcquisto = kmTotali > 0 ? costoTotaleRealeAcquisto / kmTotali : 0;

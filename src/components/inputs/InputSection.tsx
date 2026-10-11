@@ -141,6 +141,7 @@ export const InputSection: React.FC<InputSectionProps> = ({
 
         {activeTab === 'acquisto' && (
           <PurchaseInputs
+            metodoPagamentoNuovo={inputs.metodoPagamentoNuovo}
             prezzoAuto={inputs.prezzoAuto}
             anticipoAcquisto={inputs.anticipoAcquisto}
             tassoTaeg={inputs.tassoTaeg}
@@ -156,6 +157,7 @@ export const InputSection: React.FC<InputSectionProps> = ({
 
         {activeTab === 'usato' && (
           <UsedCarInputs
+            metodoPagamentoUsato={inputs.metodoPagamentoUsato}
             usatoPrezzoAuto={inputs.usatoPrezzoAuto}
             usatoAnticipoAcquisto={inputs.usatoAnticipoAcquisto}
             usatoTassoTaeg={inputs.usatoTassoTaeg}

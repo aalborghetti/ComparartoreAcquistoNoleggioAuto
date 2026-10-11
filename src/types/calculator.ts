@@ -1,9 +1,12 @@
+export type MetodoPagamento = 'tutto_subito' | 'finanziamento';
+
 export interface CarCalculatorInputs {
   // Parametri Generali
   durataMesi: number;
   kmAnnui: number;
 
   // Acquisto Auto Nuova
+  metodoPagamentoNuovo?: MetodoPagamento;
   prezzoAuto: number;
   anticipoAcquisto: number;
   tassoTaeg: number; // %
@@ -13,6 +16,7 @@ export interface CarCalculatorInputs {
   valoreResiduoPercentuale: number; // %
 
   // Acquisto Auto Usata (Costi acquisto più bassi, manutenzione più elevata)
+  metodoPagamentoUsato?: MetodoPagamento;
   usatoPrezzoAuto: number;
   usatoAnticipoAcquisto: number;
   usatoTassoTaeg: number;

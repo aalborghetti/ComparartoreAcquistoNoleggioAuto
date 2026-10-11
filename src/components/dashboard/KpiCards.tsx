@@ -38,7 +38,7 @@ export const KpiCards: React.FC<KpiCardsProps> = ({ summary, inputs }) => {
               </div>
               <div>
                 <span className="text-[10px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider block">
-                  Proprietà
+                  Proprietà {inputs.metodoPagamentoNuovo === 'tutto_subito' ? '• Tutto subito' : '• Finanziata'}
                 </span>
                 <h3 className="text-xs font-bold text-slate-800 dark:text-slate-200">
                   Auto Nuova
@@ -94,7 +94,7 @@ export const KpiCards: React.FC<KpiCardsProps> = ({ summary, inputs }) => {
               </div>
               <div>
                 <span className="text-[10px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider block">
-                  Usato Garantito
+                  Usato {inputs.metodoPagamentoUsato === 'tutto_subito' ? '• Tutto subito' : '• Finanziato'}
                 </span>
                 <h3 className="text-xs font-bold text-slate-800 dark:text-slate-200">
                   Auto Usata
